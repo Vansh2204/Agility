@@ -27,22 +27,22 @@ root.render(
   <AuthHandler>
     <StrictMode>
       <BrowserRouter>
-        
+
         <Routes>
           <Route path='/' element={<Landing />} />
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
-          
-          <Route path='/dashboard' element={<Dashboard />} >  
-          <Route path='' element={<HomePage />} />
-          <Route path='mywork' element={<MyWork />} />
-          <Route path='sprint' element={<Sprints />} />
-          <Route path='profile' element={<Profile />} />
-          <Route path='project' element={<Project />} />
-          <Route path='project/:projectID' element={<ProjectDetail />} />
-          <Route path='project/:projectID/sprint/:sprintID' element={<SprintDetail/>}/>
 
-          
+          <Route path='/dashboard' element={<Dashboard />} >
+            <Route path='' element={<HomePage />} />
+            <Route path='mywork' element={<MyWork />} />
+            <Route path='sprint' element={<Sprints />} />
+            <Route path='profile' element={<Profile />} />
+            <Route path='project' element={<Project />} />
+            <Route path='project/:projectID' element={<ProjectDetail />} />
+            <Route path='project/:projectID/sprint/:sprintID' element={<SprintDetail />} />
+
+
 
           </Route>
         </Routes>
