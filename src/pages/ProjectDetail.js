@@ -275,12 +275,14 @@ export default function ProjectDetail() {
         <h2 className="text-lg font-semibold mb-4">Sprints</h2>
         {sprints.map((sprint, index) => (
           <div key={index} className="bg-white rounded-lg shadow p-4 mb-4">
+            <Link to={'sprint/' + sprint.sprintID }>
             <div
               className="flex justify-between items-center cursor-pointer"
             >
               <h3 className="text-lg font-semibold">{sprint.sprintName}</h3>
-              <Link to={'sprint/' + sprint.sprintID }><ChevronRight size={20} /></Link> 
+              <ChevronRight size={20} />
             </div>
+            </Link> 
             {/* {openSprint === index && (
               <div className="mt-4">
                 <p>

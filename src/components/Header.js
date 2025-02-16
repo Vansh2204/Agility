@@ -60,9 +60,30 @@ export default function Header() {
                             </div>
                             <div class="hidden lg:flex lg-flex-1 lg:gap-x-12 lg:justify-end">
                                 <a href="#" class="text-sm/6 font-semibold text-black cursor-pointer"><Bell size={20} /></a>
-                                <a href="#" class="text-sm/6 font-semibold text-black cursor-pointer"><UserPlus size={20} /></a>
+                                <a href="#" class="text-sm/6 font-semibold text-black cursor-pointer"><UserPlus size={20} onClick={()=>setIsDialogOpen(true)}/></a>
                                
                             </div>
+                            {isDialogOpen &&(
+                                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                                    <h2 className="text-xl font-semibold mb-4">Invite</h2>
+                                    <div className="space-y-3">
+                                        <input
+                                            type="text"
+                                            name="projectName"
+                                            placeholder="Project Name"
+                                            className="w-full border p-2 rounded"
+                                        />
+                                    </div>
+                                    <div className="flex justify-end mt-4 space-x-2">
+                                        <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => { setIsDialogOpen(false) }}>
+                                            Cancel
+                                        </button>
+                                        <button className="bg-black text-white px-4 py-2 rounded">Send Invite</button>
+                                    </div>
+                                </div>
+                            </div>
+                            )}
                             
 
 

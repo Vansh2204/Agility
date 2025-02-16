@@ -45,30 +45,30 @@ export default function Dashboard() {
                 <div className="w-64 shadow-sm rounded-tr-lg text-black p-5" >
                     <ul>
                         <li
-                            className={`p-2 cursor-pointer text-black flex items-cente font-bold tracking-wide font-sans text-lg hover:bg-white px-2 py-1 rounded  `}
+                            className={`p-2 cursor-pointer text-black flex items-cente font-semibold tracking-wide font-sans text-lg hover:bg-white px-2 py-1 rounded  `}
                             onClick={() => navigate("/dashboard")}
 
                         ><Home size={20} className="m-2" /> Home
                         </li>
                         <li
-                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-bold font-sans hover:bg-white px-2 py-1 rounded  `}
+                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-semibold font-sans hover:bg-white px-2 py-1 rounded  `}
                             onClick={() => navigate("/dashboard/mywork")}
                         ><BookOpenCheck size={20} className="m-2" />  My Work
                         </li>
                         <li
-                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-bold font-sans hover:bg-white px-2 py-1 rounded  `}
+                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-semibold font-sans hover:bg-white px-2 py-1 rounded  `}
                             onClick={() => navigate("/dashboard/project")}
 
                         ><SquareDashedKanban size={20} className="m-2" /> Project
                         </li>
 
                         <li
-                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-bold font-sans  hover:bg-white px-2 py-1 rounded`}
+                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-semibold font-sans  hover:bg-white px-2 py-1 rounded`}
                             onClick={() => setActiveMenu("")}
                         ><Columns3 size={20} className="m-2" /> Bugs Queue
                         </li>
                         <li
-                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-bold font-sans hover:bg-white px-2 py-1 rounded`}
+                            className={`p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-semibold font-sans hover:bg-white px-2 py-1 rounded`}
                             onClick={() => navigate("/dashboard/profile")}
                         ><User size={20} className="m-2" /> Profile
                         </li>
@@ -93,7 +93,7 @@ export default function Dashboard() {
 
                     </ul>
                     <ul className="mt-5 ms-2">
-                        <li className="p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-bold font-sans hover:bg-white py-1 rounded" onClick={handlelogout}><LogOut size={20} className="m-1" />Logout</li>
+                        <li className="p-2 cursor-pointer text-black flex items-center text-lg tracking-wide font-semibold font-sans hover:bg-white py-1 rounded" onClick={handlelogout}><LogOut size={20} className="m-1" />Logout</li>
                     </ul>
 
                 </div>
