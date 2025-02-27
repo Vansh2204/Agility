@@ -11,6 +11,7 @@ export default function SprintDetail() {
     const [loading, setLoading] = useState(true);
     const [activeMenu, setActiveMenu] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isBugDialogOpen, setBugDialogOpen] = useState(false);
     const [userData] = useState(JSON.parse(sessionStorage.getItem("userData")));
 
     const [userTasks, setUserTasks] = useState({
@@ -23,6 +24,17 @@ export default function SprintDetail() {
         projectID: params.projectID,
         sprintID: params.sprintID,
         userId: userData.userID,
+    });
+    const [bugs, setbugs] = useState({
+        bugID: "",
+        title: "",
+        description: "",
+        priority: "",
+        status: "",
+        assignedTo: "",
+        reportedBy:userData.userID,
+        createdDate:"",
+       
     });
 
     useEffect(() => {
@@ -93,7 +105,7 @@ export default function SprintDetail() {
 
                 });
             //console.log("Tasks Deleted")
-            toast.success("Tasks Deleted")
+            //toast.success("Tasks Deleted")
             setTasks(tasks.filter(task => task.taskID !== taskID));
 
 
@@ -101,6 +113,8 @@ export default function SprintDetail() {
             toast.error("Failed to delete")
         }
     }
+
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUserTasks((prevData) => ({
@@ -205,6 +219,84 @@ export default function SprintDetail() {
                             </div>
                         </div>
                     )}
+                    {isBugDialogOpen && (
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+                                <h2 className="text-xl font-semibold mb-4">Add to Bugs Queue</h2>
+                                <div className="space-y-3">
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        placeholder="Title"
+                                        className="w-full border p-2 rounded"
+                                        //onChange={handleChange}
+                                        //value={userTasks.taskName}
+                                    />
+                                    <input
+                                        type="textarea"
+                                        name="description"
+                                        placeholder="Bug Description"
+                                        className="w-full border p-2 rounded"
+                                        // onChange={handleChange}
+                                        // value={userTasks.taskDescription}
+                                    />
+                                     <select
+                                        name="status"
+                                        className="border border-gray-300 rounded-md p-2 w-full"
+                                        //onChange={handleChange}
+                                        //value={userTasks.taskStatus}
+                                    >
+                                        <option value="">Status</option>
+                                        <option value="Not Started">Not Started</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                    <select
+                                        name="priority"
+                                        className="border border-gray-300 rounded-md p-2 w-full"
+                                        //onChange={handleChange}
+                                        //value={userTasks.taskPriority}
+                                    >
+                                        <option value="">Priority</option>
+                                        <option value="High">High</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Medium">Medium</option>
+                                    </select>
+                                    <input
+                                        type="text"
+                                        name="assignedTo"
+                                        placeholder="Assigned To"
+                                        className="w-full border p-2 rounded"
+                                        //onChange={handleChange}
+                                        //value={userTasks.taskName}
+                                    />
+                                    <input
+                                        type="text"
+                                        name="reportedBy"
+                                        placeholder="Reported By"
+                                        className="w-full border p-2 rounded"
+                                        //onChange={handleChange}
+                                        value={bugs.reportedBy}
+                                        disabled
+                                    />
+                                    <input
+                                        type="date"
+                                        name="createdDate"
+                                        placeholder="Title"
+                                        className="w-full border p-2 rounded"
+                                        //onChange={handleChange}
+                                        //value={userTasks.taskName}
+                                    />
+                                </div>
+                                <div className="flex justify-end mt-4 space-x-2">
+                                    <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => { setBugDialogOpen(false) }}>
+                                        Cancel
+                                    </button>
+                                    <button className="bg-black text-white px-4 py-2 rounded" >Add</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="overflow-x-auto">
                         {loading ? (
@@ -242,13 +334,13 @@ export default function SprintDetail() {
                                             <tr key={index} className="border-b hover:bg-gray-100">
                                                 <td className="py-3 px-4">{t.taskName}</td>
                                                 <td className="py-3 px-4 text-gray-500">{t.taskPriority}</td>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${t.taskStatus === "Done"
+                                                <span className={`px-4 py-1 rounded-full text-xs font-semibold ${t.taskStatus === "Done"
                                                     ? "bg-green-100 text-green-800"
                                                     : t.taskStatus === "In Progress"
                                                         ? "bg-yellow-100 text-yellow-800"
                                                         : "bg-gray-100 text-gray-800"
                                                     }`}
-                                                >
+                                        >
                                                     {t.taskStatus}</span>
                                                 <td className="py-3 px-4 text-gray-500">{t.assignedTo}</td>
                                                 <td className="py-3 px-4 text-black text-sm cursor-pointer">
@@ -266,7 +358,9 @@ export default function SprintDetail() {
                                                                     onClick={() => handletaskdelete(t.taskID)}>
                                                                     <Trash2 size={16} />Delete Task
                                                                 </li>
-                                                                <li className="px-2 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer">
+                                                                <li className="px-2 py-2 flex items-center gap-2 hover:bg-gray-100 cursor-pointer"
+                                                                    onClick={() => setBugDialogOpen(true)}>
+
                                                                     <Bug size={16} /> Bug Queue
                                                                 </li>
                                                             </ul>

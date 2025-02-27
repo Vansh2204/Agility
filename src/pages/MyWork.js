@@ -83,7 +83,7 @@ export default function MyWork() {
       [name]: value,
     }));
   };
-  
+
 
   return (
     <div className="w-5xl mx-auto rounded-lg p-6">
@@ -110,7 +110,7 @@ export default function MyWork() {
             <tr key={task.taskID} className="border">
               <td className="p-2 border flex justify-between items-center">
                 {task.userTaskName}
-                <span className="text-gray-400" 
+                <span className="text-gray-400"
                 >
                   <Maximize2 size={16} />
                 </span>
@@ -188,7 +188,7 @@ export default function MyWork() {
                   className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
                   onClick={handleAddTask}
                 >
-Add
+                  Add
                 </button>
               </div>
             </div>

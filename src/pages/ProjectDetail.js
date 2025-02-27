@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../store/auth";
-import { ChevronUp, ChevronDown, EllipsisVertical, Maximize2, Edit2, Bug, Plus,ChevronRight } from "lucide-react";
+import { ChevronUp, ChevronDown, EllipsisVertical, Maximize2, Edit2, Bug, Plus, ChevronRight } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function ProjectDetail() {
   const params = useParams();
   const { authorizationToken } = useAuth();
-  const [proj, setProj] = useState({});
+  const [proj, setProj] = useState([]);
   const [sprints, setSprints] = useState([]);
   const [tasks, setTasks] = useState({});
   const [openSprint, setOpenSprint] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [istaskdialog, setistaskdialog] = useState(false);
-
+  const [activeMenu, setActiveMenu] = useState(null);
 
   const [userData, setUserData] = useState(JSON.parse(sessionStorage.getItem('userData')));
   const [userTasks, setUserTasks] = useState({
@@ -179,111 +179,219 @@ export default function ProjectDetail() {
       if (!tasks[sprintID]) fetchTasks(sprintID);
     }
   };
-  const [activeMenu, setActiveMenu] = useState(null);
 
   const toggleMenu = (taskID) => {
     setActiveMenu((prev) => (prev === taskID ? null : taskID));
   };
 
+  function formatDate(dateString: string) {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
+
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [updatedProject, setUpdatedProject] = useState(null);
+
+  const handleEdit = (index, project) => {
+    setEditingIndex(index);
+    setUpdatedProject({ ...project });
+  };
+  const cancelEdit=()=>{
+    setEditingIndex(null);
+  }
+  const handlechange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedProject((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
-    <div className="container mx-auto p-8">
-      <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 class="text-lg font-semibold mb-2">Project Overview</h2>
-        <div class="container mx-auto flex gap-4">
+    <>
+      <div class="container mx-auto">
+        <div className="bg-white p-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6">
+          {proj.map((p, index) => (
+            <div key={index}>
+              {editingIndex === index ? (
+                // Editable Form
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    name="projectName"
+                    value={updatedProject.projectName}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-md"
+                  />
+                  <textarea
+                    name="projectDescription"
+                    value={updatedProject.projectDescription}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-md"
+                  />
+                  <select
+                    name="projectStatus"
+                    value={updatedProject.projectStatus}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-md"
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Done">Done</option>
+                  </select>
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={updatedProject.startDate}
+                    onChange={handleChange}
+                    className="w-full border p-2 rounded-md"
+                  />
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={updatedProject.endDate}
+                    onChange={handlechange}
+                    className="w-full border p-2 rounded-md"
+                  />
+                  <button
+                    //onClick={() => handleSave(index)}
+                    className="bg-black text-white mt-2 px-3 py-1 rounded-md hover:bg-green-700"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    onClick={cancelEdit}
+                    className="bg-white text-black ml-2 px-3 py-1 font-medium rounded-md hover:bg-green-700"
+                  >
+                    Cancle
+                  </button>
+                </div>
+              ) : (
+                // Display Details
+                <div>
+                  <h3 className="text-lg font-medium">{p.projectName}</h3>
+                  <p className="text-sm text-gray-500">{p.projectDescription}</p>
 
-          <div class="py-4 flex justify-between w-1/2 overflow-hidden">
-            <dt class="text-sm font-medium text-gray-900">Project Name</dt>
-            <dd class="text-sm text-gray-500">Margot Foster</dd>
-          </div>
-          <div class="py-4 flex justify-between w-1/2 overflow-hidden">
-            <dt class="text-sm font-medium text-gray-900">Project Status</dt>
-            <dd class="text-sm text-gray-500">Margot Foster</dd>
-          </div>
+                  {/* Status Badge */}
+                  <span
+                    className={`px-2 py-1 mt-2 rounded-full text-xs font-semibold ${p.projectStatus === "Done"
+                        ? "bg-green-100 text-green-800"
+                        : p.projectStatus === "In Progress"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                  >
+                    {p.projectStatus}
+                  </span>
 
-        </div>
-        <div class="container mx-auto flex gap-4">
+                  <div className="flex space-x-4 text-sm mt-2">
+                    <p>
+                      <span className="font-semibold">Start: </span>
+                      {p.startDate}
+                    </p>
+                    <p>
+                      <span className="font-semibold">End: </span>
+                      {p.endDate}
+                    </p>
+                  </div>
 
-          <div class="py-4 flex justify-between w-1/1 overflow-hidden">
-            <dt class="text-sm font-medium text-gray-900">Project Description</dt>
-            <dd class="text-sm text-gray-500 ml-5">Margot Foster</dd>
-          </div>
-
-        </div>
-        <div class="container mx-auto flex gap-4 justify-between">
-
-          <div class="py-4 flex justify-between w-1/1 overflow-hidden">
-            <dt class="text-sm font-medium text-gray-900">Start Date</dt>
-            <dd class="text-sm text-gray-500 ml-5">Margot Foster</dd>
-          </div>
-          <div class="py-4 flex justify-between w-1/1">
-            <dt class="text-sm font-medium text-gray-900">End Date</dt>
-            <dd class="text-sm text-gray-500 ml-5">Margot Foster</dd>
-          </div>
-          <div class="py-4 flex justify-between w-1/1 overflow-hidden ml-5">
-            <dt class="text-sm font-medium text-gray-900">Team Lead</dt>
-            <dd class="text-sm text-gray-500 ml-5">Margot Foster</dd>
-          </div>
-
-        </div>
-      </div>
-
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">Create New Sprint</h2>
-        <div className="mb-4">
-          <label htmlFor="sprintName" className="font-bold text-gray-700">
-            Sprint Name
-          </label>
-          <input
-            type="text"
-            id="sprintName"
-            name="sprintName"
-            className="border rounded w-full p-2"
-            placeholder="Enter sprint name"
-            onChange={handleChange}
-            value={userTasks.sprintName}
-          />
-        </div>
-        <div className="flex space-x-4">
-          <div className="w-1/2">
-            <label className="font-bold text-gray-700">Start Date</label>
-            <input
-              type="date"
-              name="startDate"
-              className="border rounded w-full p-2"
-              onChange={handleChange}
-              value={userTasks.startDate}
-            />
-          </div>
-          <div className="w-1/2">
-            <label className="font-bold text-gray-700">End Date</label>
-            <input
-              type="date"
-              name="endDate"
-              className="border rounded w-full p-2"
-              onChange={handleChange}
-              value={userTasks.endDate}
-            />
-          </div>
-        </div>
-        <button className="bg-black text-white py-2 px-4 rounded mt-4" onClick={handleAddSprint}>
-          Create Sprint
-        </button>
-      </div>
-
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Sprints</h2>
-        {sprints.map((sprint, index) => (
-          <div key={index} className="bg-white rounded-lg shadow p-4 mb-4">
-            <Link to={'sprint/' + sprint.sprintID }>
-            <div
-              className="flex justify-between items-center cursor-pointer"
-            >
-              <h3 className="text-lg font-semibold">{sprint.sprintName}</h3>
-              <ChevronRight size={20} />
+                  {/* Update Button */}
+                  <button
+                    onClick={() => handleEdit(index, p)}
+                    className="mt-2 px-3 py-1 text-xs font-medium text-white bg-black rounded-md hover:bg-indigo-800"
+                  >
+                    Update Project
+                  </button>
+                </div>
+              )}
             </div>
-            </Link> 
-            {/* {openSprint === index && (
+          ))}
+
+          
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
+          <div class="bg-white p-4 rounded-lg shadow-md text-center">
+            <p class="text-gray-500">Total Sprints</p>
+            <p class="text-2xl font-bold">156</p>
+            <p class="text-xs text-gray-500">89 completed</p>
+          </div>
+          <div class="bg-white p-4 rounded-lg shadow-md text-center">
+            <p class="text-gray-500">Team Members</p>
+            <p class="text-2xl font-bold">4</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mt-4">
+          <h3 class="text-lg font-medium">Recent Activity</h3>
+          <div class="mt-4 space-y-2">
+            <p class="text-sm"><span class="font-semibold">John Doe</span> updated API documentation (2 hours ago)</p>
+            <p class="text-sm"><span class="font-semibold">Jane Smith</span> fixed login page bug (4 hours ago)</p>
+            <p class="text-sm"><span class="font-semibold">Mike Johnson</span> merged new feature branch (6 hours ago)</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto mt-4">
+        <div className="bg-white rounded-md shadow-md p-6">
+          <h2 className="text-lg font-semibold mb-4">Create New Sprint</h2>
+          <div className="mb-4">
+            <label htmlFor="sprintName" className="font-bold text-gray-700">
+              Sprint Name
+            </label>
+            <input
+              type="text"
+              id="sprintName"
+              name="sprintName"
+              className="border rounded w-full p-2"
+              placeholder="Enter sprint name"
+              onChange={handleChange}
+              value={userTasks.sprintName}
+            />
+          </div>
+          <div className="flex space-x-4">
+            <div className="w-1/2">
+              <label className="font-bold text-gray-700">Start Date</label>
+              <input
+                type="date"
+                name="startDate"
+                className="border rounded w-full p-2"
+                onChange={handleChange}
+                value={userTasks.startDate}
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="font-bold text-gray-700">End Date</label>
+              <input
+                type="date"
+                name="endDate"
+                className="border rounded w-full p-2"
+                onChange={handleChange}
+                value={userTasks.endDate}
+              />
+            </div>
+          </div>
+          <button className="bg-black text-white py-2 px-4 rounded mt-4" onClick={handleAddSprint}>
+            Create Sprint
+          </button>
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-lg font-semibold mb-4">Sprints</h2>
+          {sprints.map((sprint, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md p-4 mb-4">
+              <Link to={'sprint/' + sprint.sprintID}>
+                <div
+                  className="flex justify-between items-center cursor-pointer"
+                >
+                  <h3 className="text-lg font-semibold">{sprint.sprintName}</h3>
+                  <ChevronRight size={20} />
+                </div>
+              </Link>
+              {/* {openSprint === index && (
               <div className="mt-4">
                 <p>
                   <span className="font-medium">Start Date:</span> {sprint.startDate}
@@ -401,9 +509,10 @@ export default function ProjectDetail() {
 
             )} */}
 
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
