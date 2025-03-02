@@ -14,7 +14,7 @@ export default function ProjectDetail() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [istaskdialog, setistaskdialog] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
-
+  const [selectedTask, setSelectedTask] = useState(null);
   const [userData, setUserData] = useState(JSON.parse(sessionStorage.getItem('userData')));
   const [userTasks, setUserTasks] = useState({
     sprintID: "",
@@ -34,7 +34,8 @@ export default function ProjectDetail() {
     userId: userData.userID
   });
 
-  const handletaskpopup = () => {
+  const handletaskpopup = (proj) => {
+    setSelectedTask(proj);
     setIsDialogOpen(true);
   };
   const handleclosepopup = () => {
@@ -133,184 +134,155 @@ export default function ProjectDetail() {
     }
   };
 
-  const handleAddTask = async () => {
-    try {
-      const { taskID, ...taskData } = formdata;
-      const response = await fetch("https://localhost:44302/api/Tasks/InsertTask", {
-        method: "POST",
-        body: JSON.stringify(taskData),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authorizationToken,
-        },
-      })
-      if (response.ok) {
-        setIsDialogOpen(false);
-        setformdata({
-          taskID: "",
-          taskName: "",
-          taskDescription: "",
-          taskStatus: "",
-          assignedTo: "",
-          projectID: params.projectID,
-          sprintID: userTasks.sprintID,
-          userId: userData.userID
-        })
-        fetchTasks();
-      }
-    } catch {
+  
 
-    }
-  }
-
-  const handletaskchange = (e) => {
-    const { name, value } = e.target;
-    setformdata((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const toggleSprint = (index, sprintID) => {
-    if (openSprint === index) {
-      setOpenSprint(null);
-    } else {
-      setOpenSprint(index);
-      if (!tasks[sprintID]) fetchTasks(sprintID);
-    }
-  };
-
-  const toggleMenu = (taskID) => {
-    setActiveMenu((prev) => (prev === taskID ? null : taskID));
-  };
+ 
 
   function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
       day: "numeric",
+      month: "long",
+      year: "numeric",
+      
     });
   }
 
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [updatedProject, setUpdatedProject] = useState(null);
+  
 
-  const handleEdit = (index, project) => {
-    setEditingIndex(index);
-    setUpdatedProject({ ...project });
+
+  
+
+  const handleUpdateProject = async (index) => {
+    try {
+      console.log(selectedTask)
+      const response = await fetch(
+        `https://localhost:44302/api/Projects/UpdateProject/${params.projectID}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(selectedTask),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+        }
+      );
+
+      if (response.ok) {
+        console.log(response)
+        toast.success("Project updated successfully");
+        fetchData(); // Refresh the project list
+      } else {
+        console.log(response)
+        toast.error("Failed to update project");
+      }
+    } catch (error) {
+      console.error("Error updating project:", error);
+      toast.error("An error occurred while updating the project.");
+    }
   };
-  const cancelEdit=()=>{
-    setEditingIndex(null);
-  }
-  const handlechange = (e) => {
+
+  const handleprojchange = (e) => {
     const { name, value } = e.target;
-    setUpdatedProject((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSelectedTask((prev) => ({ ...prev, [name]: value }));
   };
-
   return (
     <>
       <div class="container mx-auto">
         <div className="bg-white p-6 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6">
           {proj.map((p, index) => (
             <div key={index}>
-              {editingIndex === index ? (
-                // Editable Form
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    name="projectName"
-                    value={updatedProject.projectName}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded-md"
-                  />
-                  <textarea
-                    name="projectDescription"
-                    value={updatedProject.projectDescription}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded-md"
-                  />
-                  <select
-                    name="projectStatus"
-                    value={updatedProject.projectStatus}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded-md"
-                  >
-                    <option value="Not Started">Not Started</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Done">Done</option>
-                  </select>
-                  <input
-                    type="date"
-                    name="startDate"
-                    value={updatedProject.startDate}
-                    onChange={handleChange}
-                    className="w-full border p-2 rounded-md"
-                  />
-                  <input
-                    type="date"
-                    name="endDate"
-                    value={updatedProject.endDate}
-                    onChange={handlechange}
-                    className="w-full border p-2 rounded-md"
-                  />
-                  <button
-                    //onClick={() => handleSave(index)}
-                    className="bg-black text-white mt-2 px-3 py-1 rounded-md hover:bg-green-700"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={cancelEdit}
-                    className="bg-white text-black ml-2 px-3 py-1 font-medium rounded-md hover:bg-green-700"
-                  >
-                    Cancle
-                  </button>
+
+              <div>
+                <h3 className="text-lg font-medium">{p.projectName}</h3>
+                <p className="text-sm text-gray-500">{p.projectDescription}</p>
+
+                {/* Status Badge */}
+                <span
+                  className={`px-2 py-1 mt-2 rounded-full text-xs font-semibold ${p.projectStatus === "Done"
+                    ? "bg-green-100 text-green-800"
+                    : p.projectStatus === "In Progress"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
+                    }`}
+                >
+                  {p.projectStatus}
+                </span>
+
+                <div className="flex space-x-4 text-sm mt-2">
+                  <p>
+                    <span className="font-semibold">Start: </span>
+                    {formatDate(p.startDate)}
+                  </p>
+                  <p>
+                    <span className="font-semibold">End: </span>
+                    {formatDate(p.endDate)}
+                  </p>
                 </div>
-              ) : (
-                // Display Details
-                <div>
-                  <h3 className="text-lg font-medium">{p.projectName}</h3>
-                  <p className="text-sm text-gray-500">{p.projectDescription}</p>
 
-                  {/* Status Badge */}
-                  <span
-                    className={`px-2 py-1 mt-2 rounded-full text-xs font-semibold ${p.projectStatus === "Done"
-                        ? "bg-green-100 text-green-800"
-                        : p.projectStatus === "In Progress"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                  >
-                    {p.projectStatus}
-                  </span>
+                {/* Update Button */}
+                <button
+                  onClick={()=>handletaskpopup(p)}
+                  className="mt-2 px-3 py-1 text-xs font-medium text-white bg-black rounded-md hover:bg-indigo-800"
+                >
+                  Update Project
+                </button>
+              </div>
 
-                  <div className="flex space-x-4 text-sm mt-2">
-                    <p>
-                      <span className="font-semibold">Start: </span>
-                      {p.startDate}
-                    </p>
-                    <p>
-                      <span className="font-semibold">End: </span>
-                      {p.endDate}
-                    </p>
-                  </div>
-
-                  {/* Update Button */}
-                  <button
-                    onClick={() => handleEdit(index, p)}
-                    className="mt-2 px-3 py-1 text-xs font-medium text-white bg-black rounded-md hover:bg-indigo-800"
-                  >
-                    Update Project
-                  </button>
-                </div>
-              )}
             </div>
           ))}
 
-          
+{isDialogOpen && selectedTask &&(
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+              <div className="bg-white p-6 rounded-lg shadow-md w-1/3">
+                <h2 className="text-lg font-semibold mb-4">Update Project</h2>
+                <input 
+                  type="text" 
+                  name="projectName" 
+                  value={selectedTask.projectName} 
+                  onChange={handleprojchange} 
+                  className="border p-2 w-full mb-2" 
+                  placeholder="Project Name" 
+                />
+                <textarea 
+                  name="description" 
+                  value={selectedTask.projectDescription} 
+                  onChange={handleprojchange} 
+                  className="border p-2 w-full mb-2" 
+                  placeholder="Description" 
+                ></textarea>
+                <select 
+                  name="status" 
+                  value={selectedTask.projectStatus} 
+                  onChange={handleprojchange} 
+                  className="border p-2 w-full mb-2">
+                  <option value="Not Started">Not Started</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+                <input 
+                  type="date" 
+                  name="startDate" 
+                  value={selectedTask.startDate ? new Date(selectedTask.startDate).toISOString().split("T")[0] : ""} 
+                  onChange={handleprojchange} 
+                  className="border p-2 w-full mb-2" 
+                />
+                <input 
+                  type="date" 
+                  name="endDate" 
+                  value={selectedTask.endDate ? new Date(selectedTask.endDate).toISOString().split("T")[0] : ""} 
+                  onChange={handleprojchange} 
+                  className="border p-2 w-full mb-2" 
+                />
+                <button className="mt-4 bg-black text-white px-4 py-2 rounded" onClick={handleUpdateProject}>
+                  Update
+                </button>
+                <button className="mt-4 text-black  px-4 py-2 rounded" onClick={handleclosepopup}>
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-3">
